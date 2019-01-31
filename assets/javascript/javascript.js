@@ -27,7 +27,7 @@ firebase.initializeApp(config);
 var database = firebase.database();
 
 // 2. This creates the button for adding trains:
-$("#add-train-btn").on("click", function (event) {
+$("#submit").on("click", function (event) {
 
     // This prevents the form from refreshing itself when the button is clicked:
     event.preventDefault();
@@ -35,7 +35,7 @@ $("#add-train-btn").on("click", function (event) {
     // This grabs the user input according the following assigned variables:
     var trainName = $("#train-name-input").val().trim();
     var trainDestination = $("#destination-input").val().trim();
-    var trainStart = moment($("#start-time-input").val().trim(), "").format("X");
+    var trainStart = moment($("#start-time-input").val().trim(), "HH:mm").format("X");
     var trainFrequency = $("#frequency-input").val().trim();
 
     // This creates a local "temporary" object for containing train data:
@@ -73,6 +73,9 @@ database.ref().on("child_added", function (childSnapshot) {
     var trainName = childSnapshot.val().name;
     var trainDestination = childSnapshot.val().destination;
     var trainStart = childSnapshot.val().start;
+
+    trainStart = moment.unix(trainStart).format("HH:mm");
+
     var trainFrequency = childSnapshot.val().frequency;
 
     // This logs the train data to the console:
@@ -81,23 +84,46 @@ database.ref().on("child_added", function (childSnapshot) {
     console.log(trainStart);
     console.log(trainFrequency);
 
-    // This prettifies the train start time:
-    var trainStartPretty = moment.unix(trainStart).format("HH:mm");
+    // This :
+    var times = calculateTimes(trainFrequency, trainStart);
 
-    // This calculates the minutes remaining until the train arrives: 
-    var trainRemaining = moment().diff(moment(trainStart, "X"), "minutes");
-    console.log(trainRemaining);
+    // This creates a new row in the train schedule:
+    var newRow = $("<tr>").append(
+        $("<td>").text(trainName),
+        $("<td>").text(trainDestination),
+        $("<td>").text(trainFrequency),
+        $("<td>").text(times.nextTrain),
+        $("<td>").text(times.minutesTillTrain),
+    );
 
-      // This creates a new row in the train schedule:
-  var newRow = $("<tr>").append(
-    $("<td>").text(trainName),
-    $("<td>").text(trainDestination),
-    $("<td>").text(trainStartPretty),
-    // $("<td>").text(empMonths),
-    $("<td>").text(trainFrequency),
-    // $("<td>").text(empBilled)
-  );
-
-  // This appends the new row to the train schedule:
-  $("#train-schedule > tbody").append(newRow);
+    // This appends the new row to the train schedule:
+    $("#train-schedule").append(newRow);
 });
+
+function calculateTimes(frequency, startTime) {
+    var tFrequency = frequency;
+
+    // Time is 3:30 AM
+    var firstTime = startTime;
+
+    // First Time (pushed back 1 year to make sure it comes before current time)
+    var firstTimeConverted = moment(firstTime, "HH:mm").subtract(1, "years");
+
+    // Difference between the times:
+    var diffTime = moment().diff(moment(firstTimeConverted), "minutes");
+
+    // Time apart (remainder):
+    var tRemainder = diffTime % tFrequency;
+
+    // Minutes Until next Train:
+    var tMinutesTillTrain = tFrequency - tRemainder;
+
+    // Next Train
+    var nextTrain = moment().add(tMinutesTillTrain, "minutes").format("hh:mm");
+
+    // return [tMinutesTillTrain, nextTrain];
+    return {
+        minutesTillTrain: tMinutesTillTrain,
+        nextTrain: nextTrain
+    }
+}
