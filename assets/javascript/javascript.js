@@ -34,16 +34,16 @@ $("#add-train-btn").on("click", function (event) {
 
     // This grabs the user input according the following assigned variables:
     var trainName = $("#train-name-input").val().trim();
-    var destinationName = $("#destination-input").val().trim();
-    var startTime = moment($("#start-time-input").val().trim(), "").format("X");
-    var frequency = $("#frequency-input").val().trim();
+    var trainDestination = $("#destination-input").val().trim();
+    var trainStart = moment($("#start-time-input").val().trim(), "").format("X");
+    var trainFrequency = $("#frequency-input").val().trim();
 
     // This creates a local "temporary" object for containing train data:
     var newTrain = {
         name: trainName,
-        destination: destinationName,
-        start: startTime,
-        frequency: frequency
+        destination: trainDestination,
+        start: trainStart,
+        frequency: trainFrequency
     };
 
     // This uploads train data to the database:
@@ -70,4 +70,34 @@ database.ref().on("child_added", function (childSnapshot) {
     console.log(childSnapshot.val());
 
     // This stores everything into a variable:
-}
+    var trainName = childSnapshot.val().name;
+    var trainDestination = childSnapshot.val().destination;
+    var trainStart = childSnapshot.val().start;
+    var trainFrequency = childSnapshot.val().frequency;
+
+    // This logs the train data to the console:
+    console.log(trainName);
+    console.log(trainDestination);
+    console.log(trainStart);
+    console.log(trainFrequency);
+
+    // This prettifies the train start time:
+    var trainStartPretty = moment.unix(trainStart).format("HH:mm");
+
+    // This calculates the minutes remaining until the train arrives: 
+    var trainRemaining = moment().diff(moment(trainStart, "X"), "minutes");
+    console.log(trainRemaining);
+
+      // This creates a new row in the train schedule:
+  var newRow = $("<tr>").append(
+    $("<td>").text(trainName),
+    $("<td>").text(trainDestination),
+    $("<td>").text(trainStartPretty),
+    // $("<td>").text(empMonths),
+    $("<td>").text(trainFrequency),
+    // $("<td>").text(empBilled)
+  );
+
+  // This appends the new row to the train schedule:
+  $("#train-schedule > tbody").append(newRow);
+});
