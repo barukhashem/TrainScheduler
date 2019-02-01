@@ -84,7 +84,7 @@ database.ref().on("child_added", function (childSnapshot) {
     console.log(trainStart);
     console.log(trainFrequency);
 
-    // This variable for the calculateTimes function:
+    // This creates a variable for the calculateTimes function:
     var times = calculateTimes(trainFrequency, trainStart);
 
     // This creates a new row in the train schedule:
@@ -100,13 +100,14 @@ database.ref().on("child_added", function (childSnapshot) {
     $("#train-schedule").append(newRow);
 });
 
+// This function calculates the remaining minutes:
 function calculateTimes(frequency, startTime) {
     var tFrequency = frequency;
 
-    // Time is 3:30 AM
+    // Example time is 3:30 AM:
     var firstTime = startTime;
 
-    // First Time (pushed back 1 year to make sure it comes before current time)
+    // First Time (pushed back 1 year to make sure it comes before current time):
     var firstTimeConverted = moment(firstTime, "HH:mm").subtract(1, "years");
 
     // Difference between the times:
