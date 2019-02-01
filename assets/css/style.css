@@ -1,0 +1,30 @@
+body {
+    background-color: lightgray;
+}
+
+h1 {
+    font-family: 'Ewert', cursive;
+    color: black;
+    font-size: 64px;
+    text-align: center;
+}
+
+.jumbotron {
+    border: 1px solid black;
+}
+
+.card-header {
+    background-color: #1281e9;
+    color: white;
+    font-weight: bold;
+}
+
+.form-group {
+    color: black;
+    font-weight: bold;
+}
+
+.card {
+    border: 1px solid #1281e9;
+    margin-bottom: 5px;
+}

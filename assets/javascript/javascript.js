@@ -84,7 +84,7 @@ database.ref().on("child_added", function (childSnapshot) {
     console.log(trainStart);
     console.log(trainFrequency);
 
-    // This :
+    // This variable for the calculateTimes function:
     var times = calculateTimes(trainFrequency, trainStart);
 
     // This creates a new row in the train schedule:
@@ -115,10 +115,10 @@ function calculateTimes(frequency, startTime) {
     // Time apart (remainder):
     var tRemainder = diffTime % tFrequency;
 
-    // Minutes Until next Train:
+    // Minutes until the next train:
     var tMinutesTillTrain = tFrequency - tRemainder;
 
-    // Next Train
+    // Next train:
     var nextTrain = moment().add(tMinutesTillTrain, "minutes").format("hh:mm");
 
     // return [tMinutesTillTrain, nextTrain];
